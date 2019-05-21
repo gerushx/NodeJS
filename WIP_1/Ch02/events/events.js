@@ -34,7 +34,6 @@ emitter.on('work', doWorkHandler4);
 emitter.on('break', ()=> {console.log('*******')});
 emitter.on('break', doWorkHandler4);
 
-
 emitter.emit('work');
 emitter.emit('work');
  emitter.emit('break');
