@@ -1,3 +1,9 @@
+$('tr').hover(function () {
+	$(this).find('td').addClass('hovered');
+}, function () {
+	$(this).find('td').removeClass('hovered');
+});
+
 function filter() {
 	let td1, td2, td3, i;
 	let input = $("#inputSearch").val();

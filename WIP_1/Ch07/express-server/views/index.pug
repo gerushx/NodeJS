@@ -10,7 +10,9 @@ block content
 			input.form-control#inputSearch(type="text", onkeyup="filter()", placeholder="Search (name, email or hire date)")
 		.col-md-3
 		.col-md-12
+			a.btn.btn-success(href="students/create") New Student
 			form(method='POST', action='/generate')
+				input(type="hidden", name="_csrf", value=csrfToken)
 				button.btn.btn-warning(type='submit') Generate Students
 
 	.col-md-2
@@ -22,7 +24,7 @@ block content
 				th Email
 				th Hire Date
 			each student in students
-				tr
+				tr(onclick=`location.href='students/${student.id}';`)
 					td #{student.nameFirst} #{student.nameLast}
 					td #{student.email}
 					td #{student.hireDate.format("MM/DD/YYYY")}

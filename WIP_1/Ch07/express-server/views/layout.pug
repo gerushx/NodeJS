@@ -1,3 +1,6 @@
+mixin valueInput(required, type, fieldName, defaultValue)
+	input.form-control(class={invalid: (errors[fieldName] != null)}, type='text', name=fieldName, value=(body[fieldName] || defaultValue), required)
+
 doctype html
 html
 	head
@@ -37,6 +40,15 @@ html
 								a(href="/logout") Logout
 
 		.container.content
+			if Object.keys(errors).length > 0
+				div.errors
+					strong One or more fields were invalid:
+
+					ul
+						for field in Object.keys(errors)
+							li.error
+								| #{errors[field].message}
+
 			block content
 
 		include foot

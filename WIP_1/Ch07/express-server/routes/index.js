@@ -11,16 +11,8 @@ module.exports = function({db}) {
 	const createStudentObject = require("../lib/create-student-object")({db});
 	let router = require("express-promise-router")();
 
-	router.get("/", requireLogin, (req, res) => {
-		return Promise.try(() => {
-			return db("students");
-		}).map((student) => {
-			return createStudentObject(student);
-		}).then((students) => {
-			res.render("index", {
-				students: students
-			});
-		});
+	router.get("/", (req, res) => {
+		res.redirect("/students");
 	});
 
 	router.get("/class", (req, res) => {
@@ -60,7 +52,7 @@ module.exports = function({db}) {
 				jsSkill: pickItem(skillLevel),
 			});
 		}).then(() => {
-			res.redirect("/");
+			res.redirect("/students");
 		});
 	});
 

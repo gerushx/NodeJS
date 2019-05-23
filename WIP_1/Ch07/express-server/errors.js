@@ -4,5 +4,6 @@ const createError = require("create-error");
 
 module.exports = {
 	AuthenticationError: createError("AuthenticationError", {isCustomError: true, statusCode: 401}),
-	ValidationError: createError("ValidationError", {isCustomError: true, statusCode: 422})
+	UnauthorizedError: createError("UnauthorizedError", {isCustomError: true, statusCode: 403}),
+	NotFoundError: createError("NotFoundError", {isCustomError: true, statusCode: 404})
 };

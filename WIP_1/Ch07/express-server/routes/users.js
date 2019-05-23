@@ -1,14 +1,35 @@
 
 
 const Promise = require("bluebird");
+const checkit = require("checkit");
 const scryptForHumans = require("scrypt-for-humans");
 const databaseError = require("database-error");
-const errors = require("../errors");
 
 let duplicateUsername = {
 	name: "UniqueConstraintViolationError",
 	table: "accounts",
 	column: "username"
+}
+
+/* The following are checkit-style error messages, that are used to display the
+   non-checkit errors to the user. */
+
+let wrongUsernameErrors = {
+	username: {
+		message: "No such username exists."
+	}
+}
+
+let wrongPasswordErrors = {
+	password: {
+		message: "The specified password is invalid."
+	}
+}
+
+let duplicateUsernameErrors = {
+	username: {
+		message: "This username already exists."
+	}
 }
 
 module.exports = function({db}) {
@@ -20,6 +41,11 @@ module.exports = function({db}) {
 
 	router.post("/register", (req, res) => {
 		return Promise.try(() => {
+			return checkit({
+				username: "required",
+				password: "required" // Shouldn't there be a 'confirm password' too?
+			}).run(req.body);
+		}).then(() => {
 			return scryptForHumans.hash(req.body.password);
 		}).then((hash) => {
 			return db("accounts").insert({
@@ -36,7 +62,13 @@ module.exports = function({db}) {
 		}).catch((err) => {
 			databaseError.rethrow(err);
 		}).catch(duplicateUsername, (err) => {
-			throw new errors.ValidationError("Username already exists");
+			res.render("admin/register", {
+				errors: duplicateUsernameErrors
+			});
+		}).catch(checkit.Error, (err) => {
+			res.render("admin/register", {
+				errors: err.errors
+			});
 		});
 	});
 
@@ -46,12 +78,19 @@ module.exports = function({db}) {
 
 	router.post("/login", (req, res) => {
 		return Promise.try(() => {
+			return checkit({
+				username: "required",
+				password: "required"
+			}).run(req.body);
+		}).then(() => {
 			return db("accounts").where({
 				username: req.body.username
 			}).first();
 		}).then((user) => {
 			if (user == null) {
-				throw new errors.AuthenticationError("Incorrect username");
+				res.render("admin/login", {
+					errors: wrongUsernameErrors
+				})
 			} else {
 				return Promise.try(() => {
 					return scryptForHumans.verifyHash(req.body.password, user.hash);
@@ -59,11 +98,17 @@ module.exports = function({db}) {
 					req.session.userId = user.id;
 					return req.saveSession();
 				}).then(() => {
-					res.redirect("/");
+					res.redirect("/students");
 				});
 			}
 		}).catch(scryptForHumans.PasswordError, (err) => {
-			throw new errors.AuthenticationError("Incorrect password");
+			res.render("admin/login", {
+				errors: wrongPasswordErrors
+			});
+		}).catch(checkit.Error, (err) => {
+			res.render("admin/login", {
+				errors: err.errors
+			});
 		});
 	});
 
