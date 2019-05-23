@@ -4,13 +4,15 @@ const http = require('http');
 
 //hostname has default of localhost
 
+//can set the port to listen on
+const port = 3131;
 
 const server = http.createServer();
 
 //this is what happens when you pass the handler directly
 // in to createServer
 server.on('request', (request, response) => {
-  response.end('Hello Planet!');
+  response.end('Hello Universe!');
 });
 
 
@@ -21,5 +23,5 @@ server.listen(3131, (err) => {
     return console.log('something bad happened', err);
   }
 
-  console.log(`Server is listening on 3131`);
+  console.log(`Server running at http://localhost:${port}/`);
 });
